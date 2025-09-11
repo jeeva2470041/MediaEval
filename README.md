@@ -26,9 +26,10 @@ Naming convention:
 
 Folder structure:
 
-RET_CLIP_SMALL/  
+RET_CLIP_SMALLS/  
 RET_CLIP_LARGE/  
 GEN_SDXL_LARGE/  
+GEN_SDXL_SMALL
 
 2. Approaches
 🔹 A. Image Retrieval (CLIP + FAISS)
