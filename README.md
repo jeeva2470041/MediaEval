@@ -1,65 +1,128 @@
-NewsImages 2025 – Image Retrieval (Team: ssn-coders) Overview
+MediaEval 2025 – NewsImages Task
+Team
+ELITE_CODERS
 
-This project is our submission to the MediaEval 2025 NewsImages Task.
+1. Problem Statement
 
-Focused on the image retrieval subtasks (SMALL and LARGE).
+The MediaEval 2025 NewsImages Task focuses on recommending suitable images for news articles.
 
-Goal: Recommend the most relevant image for a given news article text.
+We explored two complementary approaches:
 
-Dataset
+Image Retrieval (Primary Task) – selecting the most semantically relevant image from the provided dataset.
 
-Used the official NewsImages 2025 dataset (~8,500 articles).
+Image Generation (Experimental Approach) – generating synthetic editorial-style images using diffusion models when retrieval is not used.
 
-Each entry contains:
+Submission requirements:
 
-article_id,article_url, article_title, article_tags, image_id, image_url and metadata.
+One image recommendation per article ID
 
-Provided by the MediaEval organizers.
+PNG format images with 460×260 resolution
 
-Method
+Naming convention:
 
-CLIP (ViT-B/32): Extracted embeddings for both article text and images.
+[article_id]_ssn-coders_clip.png   (retrieval)  
+[article_id]_ssn-coders_sdxl.png   (generation)
 
-Feature fusion: Combined text and image features into joint embeddings.
 
-Batch processing: Encoded features in chunks of 500 to manage GPU memory.
+Folder structure:
 
-FAISS index: Built for efficient similarity search across 8,500 embeddings.
+RET_CLIP_SMALL/  
+RET_CLIP_LARGE/  
+GEN_SDXL_LARGE/  
 
-Retrieval: For each article title, retrieved the top-1 matching image.
+2. Approaches
+🔹 A. Image Retrieval (CLIP + FAISS)
 
-Post-processing: Resized output images to 460×260 (PNG) as per task rules.
+Preprocessing
 
-Usage
+Loaded the NewsImages 2025 dataset (~8,500 entries).
 
-Install requirements:
+Cleaned missing values and ensured consistency in IDs.
 
+Feature Extraction
+
+Used OpenAI CLIP (ViT-B/32) to encode article text (title + tags) and images.
+
+Generated joint embeddings by averaging text and image features.
+
+Processed in batches of 500 for efficiency.
+
+Indexing & Retrieval
+
+Stored embeddings in a FAISS index for efficient similarity search.
+
+For each article query, retrieved the most relevant image from the dataset.
+
+Post-processing
+
+Resized retrieved images to 460×260 using Pillow.
+
+Saved results with required naming conventions.
+
+🔹 B. Image Generation (Stable Diffusion XL)
+
+Model Setup
+
+Used stabilityai/stable-diffusion-xl-base-1.0 via the diffusers library.
+
+Adapted prompts from article titles and tags:
+
+"Editorial news photo illustrating: {title}. Keywords: {tags}. 
+ Realistic photojournalism, no text, no watermark."
+
+
+Image Generation
+
+Generated images using StableDiffusionXLPipeline.
+
+Parameters:
+
+num_inference_steps = 25
+
+guidance_scale = 7.5
+
+Output resized to 460×260.
+
+Metadata
+
+Saved prompt information in the PNG metadata for reproducibility.
+
+3. Tools & Technologies
+
+Python 3.10+
+
+PyTorch – model execution
+
+CLIP (ViT-B/32) – retrieval embeddings
+
+FAISS – similarity search
+
+Stable Diffusion XL – generative image synthesis
+
+Pandas, NumPy – dataset handling
+
+Pillow (PIL) – image resizing and saving
+
+4. Execution Steps
+Retrieval
 pip install -r requirements.txt
-
-Extract features (runs in batches, saves .npy + .csv):
-
 python extract_features.py
-
-Run retrieval (builds FAISS index and generates output images):
-
 python retrieve.py
 
-Results
 
-Submission prepared in correct MediaEval format:
+Results → RET_CLIP_SMALL/ and RET_CLIP_LARGE/
 
-RET_CLIP_SMALL/ → subset task results.
+Generation
+pip install -r requirements.txt
+python generate_images.py
 
-RET_CLIP_LARGE/ → full task results.
 
-Images named as:
+Results → GEN_SDXL_LARGE/
 
-[article_id]_ssn-coders_CLIP.png
+5. Final Results
 
-Team
+Retrieval Approach: Successfully retrieved relevant images for 8,500+ news articles, aligned with task requirements.
 
-Team name: ssn-coders
+Generation Approach: Produced synthetic editorial-style images for articles, demonstrating an alternative method when retrieval is not sufficient.
 
-Members:
-
-G.Jeeva E.Arivu Chezhiyan
+Both approaches provide 460×260 PNG outputs, meeting submission guidelines.
